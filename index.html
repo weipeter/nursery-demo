@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>托嬰中心管理系統 - Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        .container {
+            width: 100vw;
+            height: 100vh;
+            background: white;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #E96546 0%, #FBB158 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.8rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .header-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            color: #333;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-btn-feeding {
+            background: linear-gradient(135deg, #FFB6C1 0%, #FFC0CB 100%);
+        }
+
+        .header-btn-diaper {
+            background: linear-gradient(135deg, #B0E0E6 0%, #87CEEB 100%);
+        }
+
+        .header-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .students-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 20px;
+            padding: 30px;
+            height: calc(100vh - 120px);
+        }
+
+        .student-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            border: 3px solid transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 0;
+        }
+
+        .student-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .student-card.present {
+            border-color: #90EE90;
+            background: linear-gradient(135deg, #F0FFF0 0%, #E6FFE6 100%);
+        }
+
+        .student-card.absent {
+            position: relative;
+        }
+
+        .student-card.absent::after {
+            content: '請假\A\A 2025/10/02-2025/10/03\A 發燒咳嗽';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 15px;
+            white-space: pre-line;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .student-card.absent.student3::after {
+            content: '請假\A\A 2025/10/02-2025/10/03\A 發燒咳嗽';
+        }
+
+        .student-card.absent.student9::after {
+            content: '請假\A\A 2025/10/02-2025/10/03\A 家庭旅遊';
+        }
+
+        .student-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid #e0e0e0;
+            flex-shrink: 0;
+        }
+
+        .student-avatar:hover {
+            transform: scale(1.1);
+            border-color: #87CEEB;
+        }
+
+        .student-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            flex-shrink: 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-height: 44px;
+        }
+
+        .btn-feeding {
+            background: linear-gradient(135deg, #FFB6C1 0%, #FFC0CB 100%);
+            color: #333;
+        }
+
+        .btn-diaper {
+            background: linear-gradient(135deg, #B0E0E6 0%, #87CEEB 100%);
+            color: #333;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 95%;
+            max-width: 1000px;
+            height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 0;
+            flex-shrink: 0;
+        }
+
+        .modal-top-section {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .modal-student-info {
+            display: flex;
+            align-items: flex-start;
+            flex: 1;
+        }
+
+        .modal-attendance-section {
+            flex: 1;
+        }
+
+        .modal-medication-section {
+            flex: 1;
+        }
+
+        .modal-action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-shrink: 0;
+        }
+
+        .modal-action-btn {
+            flex: 1;
+            background: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 100%);
+            color: #333;
+            border: none;
+            border-radius: 15px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .modal-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-action-btn.emergency {
+            background: linear-gradient(135deg, #FFB6C1 0%, #FFC0CB 100%);
+        }
+
+        .modal-bottom-section {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .modal-feeding-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .modal-diaper-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .modal-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-right: 20px;
+            border: 4px solid #87CEEB;
+        }
+
+        .modal-info h2 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .modal-info p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .timeline-section {
+            margin-bottom: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .timeline-section h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .timeline-section h3 .title-text {
+            display: flex;
+            align-items: center;
+        }
+
+        .add-record-btn {
+            background: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-record-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 餵奶計算器Modal */
+        .calculator-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .calculator-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        #diaperModal .calculator-content {
+            max-width: 800px;
+        }
+
+        .calculator-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .calculator-header h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .calculator-display {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calculator-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .calc-btn {
+            background: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 100%);
+            color: #333;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calc-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .calc-btn.clear {
+            background: linear-gradient(135deg, #FFB6C1 0%, #FFC0CB 100%);
+        }
+
+        .calc-btn.complete {
+            background: linear-gradient(135deg, #E96546 0%, #FBB158 100%);
+            grid-column: span 3;
+            font-size: 1.1rem;
+            width: 100%;
+        }
+
+        .timeline-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .feeding .timeline-icon {
+            background: linear-gradient(135deg, #FFB6C1 0%, #FFC0CB 100%);
+        }
+
+        .diaper .timeline-icon {
+            background: linear-gradient(135deg, #B0E0E6 0%, #87CEEB 100%);
+        }
+
+        .attendance .timeline-icon {
+            background: linear-gradient(135deg, #90EE90 0%, #98FB98 100%);
+        }
+
+        .medication .timeline-icon {
+            background: linear-gradient(135deg, #FFA500 0%, #FFD700 100%);
+        }
+
+        .timeline-item {
+            background: #F8F8FF;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 4px solid #87CEEB;
+        }
+
+        .timeline-item.clickable {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item.clickable:hover {
+            background: #E6E6FA;
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-content {
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .attendance {
+            flex: 0 0 auto;
+        }
+
+        .timeline-item .time {
+            font-weight: bold;
+            color: #87CEEB;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timeline-item .time span {
+            color: #666;
+        }
+
+        .timeline-item .delete-btn {
+            color: #999;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .timeline-item .delete-btn:hover {
+            color: #ff4444;
+        }
+
+        .timeline-item .description {
+            color: #666;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .students-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .header-btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .students-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header p {
+                font-size: 1.4rem;
+            }
+
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .header-btn {
+                width: 100%;
+                padding: 12px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <p>Elephant 大象班</p>
+            <div class="header-actions">
+                <button class="header-btn header-btn-feeding" onclick="recordAllFeeding()">全班餵奶</button>
+                <button class="header-btn header-btn-diaper" onclick="recordAllDiaper()">全班換尿布</button>
+            </div>
+        </div>
+
+        <div class="students-grid">
+            <!-- 第一行學生 -->
+            <div class="student-card present" onclick="openModal('student1')">
+                <img src="./1.jpg" alt="小美" class="student-avatar">
+                <div class="student-name">小美</div>
+                <div class="action-buttons">
+                    <button class="btn btn-feeding"
+                        onclick="event.stopPropagation(); recordFeeding('student1')">餵奶</button>
+                    <button class="btn btn-diaper"
+                        onclick="event.stopPropagation(); recordDiaper('student1')">換尿布</button>
+                </div>
+            </div>
+
+            <div class="student-card" onclick="openModal('student2')">
+                <img src="./2.jpg" alt="小雅" class="student-avatar">
+                <div class="student-name">小雅</div>
+                <div class="action-buttons">
+                    <button class="btn btn-feeding"
+                        onclick="event.stopPropagation(); recordFeeding('student2')">餵奶</button>
+                    <button class="btn btn-diaper"
+                        onclick="event.stopPropagation(); recordDiaper('student2')">換尿布</button>
+                </div>
+            </div>
+
+            <div class="student-card absent student3" onclick="openModal('student3')">
+                <img src="./3.jpg" alt="小華" class="student-avatar">
+                <div class="student-name">小華</div>
+                <div class="action-buttons">
+                    <button class="btn btn-feeding"
+                        onclick="event.stopPropagation(); recordFeeding('student3')">餵奶</button>
+                    <button class="btn btn-diaper"
+                        onclick="event.stopPropagation(); recordDiaper('student3')">換尿布</button>
+                </div>
+            </div>
+
+            <div class="student-card" onclick="openModal('student4')">
+                <img src="./4.jpg" alt="小強" class="student-avatar">
+                <div class="student-name">小強</div>
+                <div class="action-buttons">
+                    <button class="btn btn-feeding"
+                        onclick="event.stopPropagation(); recordFeeding('student4')">餵奶</button>
+                    <button class="btn btn-diaper"
+                        onclick="event.stopPropagation(); recordDiaper('student4')">換尿布</button>
+                </div>
+            </div>
+
+            <div class="student-card" onclick="openModal('student5')">
+                <img src="./5.jpg" alt="小楓" class="student-avatar">
+                <div class="student-name">小楓</div>
+                <div class="action-buttons">
+                    <button class="btn btn-feeding"
+                        onclick="event.stopPropagation(); recordFeeding('student5')">餵奶</button>
+                    <button class="btn btn-diaper"
+                        onclick="event.stopPropagation(); recordDiaper('student5')">換尿布</button>
+                </div>
+            </div>
+
+            <!-- 第二行學生 -->
+            <div class="student-card" onclick="openModal('student6')">
+                <img src="./6.jpg" alt="小麗" class="student-avatar">
+                <div class="student-name">小麗</div>
+                <div class="action-buttons">
+                    <button class="btn btn-feeding"
+                        onclick="event.stopPropagation(); recordFeeding('student6')">餵奶</button>
+                    <button class="btn btn-diaper"
+                        onclick="event.stopPropagation(); recordDiaper('student6')">換尿布</button>
+                </div>
+            </div>
+
+            <div class="student-card" onclick="openModal('student7')">
+                <img src="./7.jpg" alt="小青" class="student-avatar">
+                <div class="student-name">小青</div>
+                <div class="action-buttons">
+                    <button class="btn btn-feeding"
+                        onclick="event.stopPropagation(); recordFeeding('student7')">餵奶</button>
+                    <button class="btn btn-diaper"
+                        onclick="event.stopPropagation(); recordDiaper('student7')">換尿布</button>
+                </div>
+            </div>
+
+            <div class="student-card" onclick="openModal('student8')">
+                <img src="./8.jpg" alt="小張" class="student-avatar">
+                <div class="student-name">小張</div>
+                <div class="action-buttons">
+                    <button class="btn btn-feeding"
+                        onclick="event.stopPropagation(); recordFeeding('student8')">餵奶</button>
+                    <button class="btn btn-diaper"
+                        onclick="event.stopPropagation(); recordDiaper('student8')">換尿布</button>
+                </div>
+            </div>
+
+            <div class="student-card absent student9" onclick="openModal('student9')">
+                <img src="./9.jpg" alt="小宇" class="student-avatar">
+                <div class="student-name">小宇</div>
+                <div class="action-buttons">
+                    <button class="btn btn-feeding"
+                        onclick="event.stopPropagation(); recordFeeding('student9')">餵奶</button>
+                    <button class="btn btn-diaper"
+                        onclick="event.stopPropagation(); recordDiaper('student9')">換尿布</button>
+                </div>
+            </div>
+
+            <div class="student-card" onclick="openModal('student10')">
+                <img src="./10.jpg" alt="小信" class="student-avatar">
+                <div class="student-name">小信</div>
+                <div class="action-buttons">
+                    <button class="btn btn-feeding"
+                        onclick="event.stopPropagation(); recordFeeding('student10')">餵奶</button>
+                    <button class="btn btn-diaper"
+                        onclick="event.stopPropagation(); recordDiaper('student10')">換尿布</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+
+            <div class="modal-top-section">
+                <div class="modal-student-info">
+                    <img id="modalAvatar" src="" alt="學生頭像" class="modal-avatar">
+                    <div class="modal-info">
+                        <h2 id="modalName"></h2>
+                        <p id="modalStatus"></p>
+                        <div class="modal-action-buttons">
+                            <button class="modal-action-btn" onclick="openStudentProfile()">入托資料</button>
+                            <button class="modal-action-btn emergency" onclick="openEmergencyRecord()">異常追蹤</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-medication-section">
+                    <div class="timeline-section medication">
+                        <h3><span class="title-text">
+                                <div class="timeline-icon"></div>託藥單
+                            </span></h3>
+                        <div id="medicationRecords">
+                            <!-- 託藥記錄將在這裡動態生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-bottom-section">
+                <div class="modal-feeding-section">
+                    <div class="timeline-section feeding">
+                        <h3><span class="title-text">
+                                <div class="timeline-icon"></div>餵奶記錄
+                            </span><button class="add-record-btn" onclick="addFeedingRecord()">+ 新增</button></h3>
+                        <div class="timeline-content" id="feedingRecords">
+                            <!-- 餵奶記錄將在這裡動態生成 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-diaper-section">
+                    <div class="timeline-section diaper">
+                        <h3><span class="title-text">
+                                <div class="timeline-icon"></div>換尿布記錄
+                            </span><button class="add-record-btn" onclick="addDiaperRecord()">+ 新增</button></h3>
+                        <div class="timeline-content" id="diaperRecords">
+                            <!-- 換尿布記錄將在這裡動態生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 餵奶計算器Modal -->
+    <div id="calculatorModal" class="calculator-modal">
+        <div class="calculator-content">
+            <div class="calculator-header">
+                <h3 id="calculatorTitle">餵奶記錄</h3>
+                <p id="calculatorStudent">學生姓名</p>
+            </div>
+            <div class="calculator-display" id="calculatorDisplay">0</div>
+            <div class="calculator-keypad">
+                <button class="calc-btn" onclick="calculatorInput('1')">1</button>
+                <button class="calc-btn" onclick="calculatorInput('2')">2</button>
+                <button class="calc-btn" onclick="calculatorInput('3')">3</button>
+                <button class="calc-btn" onclick="calculatorInput('4')">4</button>
+                <button class="calc-btn" onclick="calculatorInput('5')">5</button>
+                <button class="calc-btn" onclick="calculatorInput('6')">6</button>
+                <button class="calc-btn" onclick="calculatorInput('7')">7</button>
+                <button class="calc-btn" onclick="calculatorInput('8')">8</button>
+                <button class="calc-btn" onclick="calculatorInput('9')">9</button>
+                <button class="calc-btn clear" onclick="calculatorClear()">清除</button>
+                <button class="calc-btn" onclick="calculatorInput('0')">0</button>
+                <button class="calc-btn" onclick="calculatorBackspace()">←</button>
+            </div>
+            <button class="calc-btn complete" onclick="calculatorComplete()">完成</button>
+        </div>
+    </div>
+
+    <!-- 換尿布記錄Modal -->
+    <div id="diaperModal" class="calculator-modal">
+        <div class="calculator-content">
+            <div class="calculator-header">
+                <h3 id="diaperModalTitle">換尿布記錄</h3>
+                <p id="diaperModalStudent">學生姓名</p>
+            </div>
+            <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                <!-- 左側：時間和便便狀況 -->
+                <div style="flex: 1;">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 10px; color: #333; font-weight: bold;">時間：</label>
+                        <input type="time" id="diaperTimeInput"
+                            style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; text-align: center;" />
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label
+                            style="display: block; margin-bottom: 10px; color: #333; font-weight: bold;">便便狀況：</label>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                            <button class="calc-btn" onclick="selectStool('正常')"
+                                style="background: linear-gradient(135deg, #98FB98 0%, #90EE90 100%);">正常</button>
+                            <button class="calc-btn" onclick="selectStool('偏軟')"
+                                style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);">偏軟</button>
+                            <button class="calc-btn" onclick="selectStool('偏硬')"
+                                style="background: linear-gradient(135deg, #CD853F 0%, #8B4513 100%);">偏硬</button>
+                            <button class="calc-btn" onclick="selectStool('無')"
+                                style="background: linear-gradient(135deg, #E0E0E0 0%, #B8B8B8 100%);">無</button>
+                        </div>
+                        <div id="selectedStool"
+                            style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 10px; text-align: center; color: #333; font-weight: bold; min-height: 20px;">
+                            請選擇便便狀況
+                        </div>
+                    </div>
+                </div>
+                <!-- 右側：照片 -->
+                <div style="flex: 1;">
+                    <label style="display: block; margin-bottom: 10px; color: #333; font-weight: bold;">照片：</label>
+                    <input type="file" id="diaperPhotoInput" accept="image/*" multiple style="display: none;"
+                        onchange="handleDiaperPhotoUpload(event)" />
+                    <button type="button" class="calc-btn" onclick="document.getElementById('diaperPhotoInput').click()"
+                        style="width: 100%; background: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 100%); margin-bottom: 15px;">
+                        📷 上傳照片
+                    </button>
+                    <div id="diaperPhotoPreview"
+                        style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                        <!-- 照片將在這裡動態生成 -->
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="calc-btn clear" onclick="closeDiaperModal()" style="flex: 1;">取消</button>
+                <button class="calc-btn complete" onclick="diaperRecordComplete()" style="flex: 1;">完成</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 學生資料
+        const students = {
+            'student1': {
+                name: '小美',
+                avatar: './1.jpg',
+                status: '在校',
+                feeding: [
+                    { time: '08:30', description: '150ml' },
+                    { time: '10:30', description: '80ml' },
+                    { time: '12:00', description: '200ml' }
+                ],
+                diaper: [
+                    { time: '09:15', description: '', stool: '正常' },
+                    { time: '11:30', description: '', stool: '無' }
+                ],
+                attendance: [
+                    { time: '08:00', description: '簽到 - 媽媽送來' },
+                    { time: '17:30', description: '簽退 - 爸爸接走' }
+                ],
+                medication: [
+                    { time: '10:30', description: '早上點心後' },
+                    { time: '12:30', description: '午餐後' },
+                    { time: '15:00', description: '下午點心前' }
+                ]
+            },
+            'student2': {
+                name: '小雅',
+                avatar: './2.jpg',
+                status: '在校',
+                feeding: [
+                    { time: '08:45', description: '180ml' },
+                    { time: '11:00', description: '100ml' }
+                ],
+                diaper: [
+                    { time: '09:30', description: '尿布濕了，已更換', stool: '正常' }
+                ],
+                attendance: [
+                    { time: '08:15', description: '簽到 - 爸爸送來' }
+                ],
+                medication: [
+                    { time: '10:00', description: '早上點心後' },
+                    { time: '14:30', description: '下午點心前' }
+                ]
+            },
+            'student3': {
+                name: '小華',
+                avatar: './3.jpg',
+                status: '請假',
+                feeding: [],
+                diaper: [],
+                attendance: [],
+                medication: []
+            },
+            'student4': {
+                name: '小強',
+                avatar: './4.jpg',
+                status: '在校',
+                feeding: [
+                    { time: '08:20', description: '160ml' },
+                    { time: '10:00', description: '120ml' }
+                ],
+                diaper: [
+                    { time: '09:00', description: '', stool: '偏軟' },
+                    { time: '10:45', description: '', stool: '正常' }
+                ],
+                attendance: [
+                    { time: '07:45', description: '簽到 - 媽媽送來' }
+                ],
+                medication: [
+                    { time: '11:00', description: '早上點心後' },
+                    { time: '13:00', description: '午餐後' }
+                ]
+            },
+            'student5': {
+                name: '小楓',
+                avatar: './5.jpg',
+                status: '在校',
+                feeding: [
+                    { time: '08:00', description: '200ml' }
+                ],
+                diaper: [
+                    { time: '08:30', description: '', stool: '正常' }
+                ],
+                attendance: [
+                    { time: '07:30', description: '簽到 - 爸爸送來' }
+                ],
+                medication: [
+                    { time: '10:15', description: '早上點心後' },
+                    { time: '15:30', description: '下午點心前' }
+                ]
+            },
+            'student6': {
+                name: '小麗',
+                avatar: './6.jpg',
+                status: '在校',
+                feeding: [
+                    { time: '08:15', description: '140ml' },
+                    { time: '10:15', description: '100ml' }
+                ],
+                diaper: [
+                    { time: '09:45', description: '', stool: '正常' }
+                ],
+                attendance: [
+                    { time: '08:00', description: '簽到 - 媽媽送來' }
+                ],
+                medication: [
+                    { time: '09:30', description: '早上點心後' },
+                    { time: '12:15', description: '午餐後' },
+                    { time: '16:00', description: '下午點心前' }
+                ]
+            },
+            'student7': {
+                name: '小青',
+                avatar: './7.jpg',
+                status: '在校',
+                feeding: [
+                    { time: '08:30', description: '170ml' }
+                ],
+                diaper: [
+                    { time: '09:15', description: '', stool: '無' }
+                ],
+                attendance: [
+                    { time: '08:10', description: '簽到 - 爸爸送來' }
+                ],
+                medication: [
+                    { time: '11:30', description: '早上點心後' }
+                ]
+            },
+            'student8': {
+                name: '小張',
+                avatar: './8.jpg',
+                status: '在校',
+                feeding: [
+                    { time: '08:25', description: '155ml' },
+                    { time: '10:30', description: '90ml' }
+                ],
+                diaper: [
+                    { time: '09:30', description: '', stool: '正常' }
+                ],
+                attendance: [
+                    { time: '08:05', description: '簽到 - 媽媽送來' }
+                ],
+                medication: [
+                    { time: '10:45', description: '早上點心後' },
+                    { time: '13:30', description: '午餐後' },
+                    { time: '15:45', description: '下午點心前' }
+                ]
+            },
+            'student9': {
+                name: '小宇',
+                avatar: './9.jpg',
+                status: '請假',
+                feeding: [],
+                diaper: [],
+                attendance: []
+            },
+            'student10': {
+                name: '小信',
+                avatar: './10.jpg',
+                status: '在校',
+                feeding: [
+                    { time: '08:10', description: '165ml' }
+                ],
+                diaper: [
+                    { time: '09:00', description: '', stool: '偏硬' }
+                ],
+                attendance: [
+                    { time: '07:50', description: '簽到 - 爸爸送來' }
+                ],
+                medication: [
+                    { time: '09:15', description: '早上點心後' },
+                    { time: '14:00', description: '下午點心前' }
+                ]
+            }
+        };
+
+        function openModal(studentId) {
+            const student = students[studentId];
+            if (!student) return;
+
+            document.getElementById('modalAvatar').src = student.avatar;
+            document.getElementById('modalName').textContent = student.name;
+
+            // 將簽到簽退資訊顯示在狀態位置
+            let statusText = student.status;
+            if (studentId === 'student1') {
+                // 小美顯示完整簽到簽退資訊
+                if (student.attendance && student.attendance.length > 0) {
+                    const checkIn = student.attendance.find(record => record.description.includes('簽到'));
+                    const checkOut = student.attendance.find(record => record.description.includes('簽退'));
+                    if (checkIn) {
+                        statusText += ` | 簽到 ${checkIn.time}`;
+                    }
+                    if (checkOut) {
+                        statusText += ` | 簽退 ${checkOut.time}`;
+                    }
+                }
+            } else if (student.status === '在校') {
+                // 其他在校學生顯示尚未到校
+                statusText += ' | 尚未到校';
+            }
+            document.getElementById('modalStatus').textContent = statusText;
+
+            // 更新餵奶記錄
+            const feedingRecords = document.getElementById('feedingRecords');
+            feedingRecords.innerHTML = '';
+            if (student.feeding.length === 0) {
+                feedingRecords.innerHTML = '<div class="timeline-item"><div class="description">今日尚無餵奶記錄</div></div>';
+            } else {
+                student.feeding.forEach((record, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'timeline-item';
+                    item.innerHTML = `
+                        <div class="time">${record.time}<span>${record.description}</span><span class="delete-btn" onclick="deleteFeedingRecord('${studentId}', ${index})">&times;</span></div>
+                    `;
+                    feedingRecords.appendChild(item);
+                });
+            }
+
+            // 更新換尿布記錄
+            const diaperRecords = document.getElementById('diaperRecords');
+            diaperRecords.innerHTML = '';
+            if (student.diaper.length === 0) {
+                diaperRecords.innerHTML = '<div class="timeline-item"><div class="description">今日尚無換尿布記錄</div></div>';
+            } else {
+                student.diaper.forEach((record, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'timeline-item clickable';
+                    const stoolStatus = record.stool || '無';
+                    item.onclick = function (event) {
+                        // 如果點擊的是刪除按鈕或照片，不觸發編輯
+                        if (event.target.classList.contains('delete-btn') || event.target.tagName === 'IMG') {
+                            return;
+                        }
+                        editDiaperRecord(studentId, index);
+                    };
+                    let photoHtml = '';
+                    // 支援多張照片或單張照片
+                    const photos = record.photos && Array.isArray(record.photos) ? record.photos : (record.photo ? [record.photo] : []);
+                    if (photos.length > 0) {
+                        photoHtml = `<div style="margin-top: 10px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">`;
+                        photos.forEach((photo, photoIndex) => {
+                            photoHtml += `<div style="aspect-ratio: 1; overflow: hidden; border-radius: 8px; border: 2px solid #e0e0e0;"><img src="${photo}" alt="照片" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="event.stopPropagation(); window.open('${photo}', '_blank');" /></div>`;
+                        });
+                        photoHtml += `</div>`;
+                    }
+                    item.innerHTML = `
+                        <div class="time">${record.time}<span class="delete-btn" onclick="event.stopPropagation(); deleteDiaperRecord('${studentId}', ${index})">&times;</span></div>
+                        <div class="description">便便狀況：${stoolStatus}</div>
+                        ${photoHtml}
+                    `;
+                    diaperRecords.appendChild(item);
+                });
+            }
+
+
+            // 更新託藥記錄
+            const medicationRecords = document.getElementById('medicationRecords');
+            medicationRecords.innerHTML = '';
+            if (student.medication && student.medication.length === 0) {
+                medicationRecords.innerHTML = '<div class="timeline-item"><div class="description">今日無託藥</div></div>';
+            } else if (student.medication) {
+                student.medication.forEach(record => {
+                    const item = document.createElement('div');
+                    item.className = 'timeline-item';
+                    item.innerHTML = `
+                        <div class="time">${record.time}</div>
+                        <div class="description">${record.description}</div>
+                    `;
+                    medicationRecords.appendChild(item);
+                });
+            } else {
+                medicationRecords.innerHTML = '<div class="timeline-item"><div class="description">今日無託藥</div></div>';
+            }
+
+            document.getElementById('studentModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('studentModal').style.display = 'none';
+        }
+
+        function recordFeeding(studentId) {
+            openCalculator(studentId);
+        }
+
+        let currentStudentId = '';
+        let calculatorValue = '0';
+        let isAllStudentsMode = false; // 標記是否為全班模式
+
+        function openCalculator(studentId) {
+            currentStudentId = studentId;
+            isAllStudentsMode = false;
+            calculatorValue = '0';
+            document.getElementById('calculatorStudent').textContent = students[studentId].name;
+            document.getElementById('calculatorTitle').textContent = '餵奶記錄';
+            document.getElementById('calculatorDisplay').textContent = calculatorValue + 'ml';
+            document.getElementById('calculatorModal').style.display = 'block';
+        }
+
+        function openCalculatorForAllStudents() {
+            currentStudentId = '';
+            isAllStudentsMode = true;
+            calculatorValue = '0';
+            // 僅示意，顯示固定學生數量
+            document.getElementById('calculatorStudent').textContent = '全班餵奶 (8 位學生)';
+            document.getElementById('calculatorTitle').textContent = '全班餵奶記錄';
+            document.getElementById('calculatorDisplay').textContent = calculatorValue + 'ml';
+            document.getElementById('calculatorModal').style.display = 'block';
+        }
+
+        function calculatorInput(digit) {
+            if (calculatorValue === '0') {
+                calculatorValue = digit;
+            } else {
+                calculatorValue += digit;
+            }
+            document.getElementById('calculatorDisplay').textContent = calculatorValue + 'ml';
+        }
+
+        function calculatorClear() {
+            calculatorValue = '0';
+            document.getElementById('calculatorDisplay').textContent = calculatorValue + 'ml';
+        }
+
+        function calculatorBackspace() {
+            if (calculatorValue.length > 1) {
+                calculatorValue = calculatorValue.slice(0, -1);
+            } else {
+                calculatorValue = '0';
+            }
+            document.getElementById('calculatorDisplay').textContent = calculatorValue + 'ml';
+        }
+
+        function calculatorComplete() {
+            const amount = calculatorValue + 'ml';
+            const time = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+
+            if (isAllStudentsMode) {
+                // 全班模式：僅示意介面
+                // 關閉計算器
+                document.getElementById('calculatorModal').style.display = 'none';
+
+                // 顯示示意訊息
+                alert(`全班餵奶記錄（示意）：${amount}，時間：${time}`);
+            } else {
+                // 個人模式：為單一學生記錄
+                students[currentStudentId].feeding.push({
+                    time: time,
+                    description: amount
+                });
+
+                // 關閉計算器
+                document.getElementById('calculatorModal').style.display = 'none';
+
+                // 顯示成功訊息
+                alert(`已記錄 ${students[currentStudentId].name} 的餵奶：${amount}，時間：${time}`);
+            }
+        }
+
+        function closeCalculator() {
+            document.getElementById('calculatorModal').style.display = 'none';
+        }
+
+        function openStudentProfile() {
+            const studentName = document.getElementById('modalName').textContent;
+            alert(`開啟 ${studentName} 的入托資料\n\n包含：\n- 基本資料\n- 緊急聯絡人\n- 健康狀況\n- 特殊需求\n- 家長授權書`);
+        }
+
+        function openEmergencyRecord() {
+            const studentName = document.getElementById('modalName').textContent;
+            alert(`開啟 ${studentName} 的異常紀錄追蹤\n\n包含：\n- 意外事件記錄\n- 健康異常追蹤\n- 行為觀察記錄\n- 處理措施\n- 後續追蹤狀況`);
+        }
+
+        function recordDiaper(studentId) {
+            alert(`記錄 ${students[studentId].name} 的換尿布時間：${new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}`);
+        }
+
+        function deleteFeedingRecord(studentId, index) {
+            if (confirm('確定要刪除這筆餵奶記錄嗎？')) {
+                students[studentId].feeding.splice(index, 1);
+                openModal(studentId); // 重新載入modal顯示更新後的記錄
+            }
+        }
+
+        function deleteDiaperRecord(studentId, index) {
+            if (confirm('確定要刪除這筆換尿布記錄嗎？')) {
+                students[studentId].diaper.splice(index, 1);
+                openModal(studentId); // 重新載入modal顯示更新後的記錄
+            }
+        }
+
+        function addFeedingRecord() {
+            const time = prompt('請輸入餵奶時間 (格式: HH:MM):');
+            const amount = prompt('請輸入牛奶容量 (格式: XXXml):');
+
+            if (time && amount) {
+                // 找到當前modal中顯示的學生ID
+                const modalName = document.getElementById('modalName').textContent;
+                const studentId = Object.keys(students).find(id => students[id].name === modalName);
+
+                if (studentId) {
+                    students[studentId].feeding.push({
+                        time: time,
+                        description: amount
+                    });
+                    openModal(studentId); // 重新載入modal顯示更新後的記錄
+                }
+            }
+        }
+
+        let currentDiaperStudentId = '';
+        let selectedStoolValue = '';
+        let isAllDiaperMode = false; // 標記是否為全班模式
+        let editingDiaperIndex = -1; // 編輯模式時的記錄索引，-1 表示新增模式
+        let diaperPhotos = []; // 儲存當前編輯的照片陣列
+
+        function addDiaperRecord() {
+            // 找到當前modal中顯示的學生ID
+            const modalName = document.getElementById('modalName').textContent;
+            const studentId = Object.keys(students).find(id => students[id].name === modalName);
+
+            if (studentId) {
+                currentDiaperStudentId = studentId;
+                isAllDiaperMode = false;
+                editingDiaperIndex = -1; // 新增模式
+                selectedStoolValue = '';
+                document.getElementById('diaperModalTitle').textContent = '換尿布記錄';
+                document.getElementById('diaperModalStudent').textContent = students[studentId].name;
+                document.getElementById('selectedStool').textContent = '請選擇便便狀況';
+
+                // 設定預設時間為現在時間
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                document.getElementById('diaperTimeInput').value = `${hours}:${minutes}`;
+
+                // 清除照片
+                diaperPhotos = [];
+                updateDiaperPhotoPreview();
+
+                document.getElementById('diaperModal').style.display = 'block';
+            }
+        }
+
+        function editDiaperRecord(studentId, index) {
+            const record = students[studentId].diaper[index];
+            if (!record) return;
+
+            currentDiaperStudentId = studentId;
+            isAllDiaperMode = false;
+            editingDiaperIndex = index; // 編輯模式
+            selectedStoolValue = record.stool || '無';
+
+            document.getElementById('diaperModalTitle').textContent = '編輯換尿布記錄';
+            document.getElementById('diaperModalStudent').textContent = students[studentId].name;
+            document.getElementById('selectedStool').textContent = `已選擇：${selectedStoolValue}`;
+
+            // 設定時間為記錄中的時間
+            const [hours, minutes] = record.time.split(':');
+            document.getElementById('diaperTimeInput').value = `${hours}:${minutes}`;
+
+            // 如果有照片，顯示預覽
+            if (record.photos && Array.isArray(record.photos) && record.photos.length > 0) {
+                diaperPhotos = [...record.photos];
+            } else if (record.photo) {
+                // 兼容舊的單張照片格式
+                diaperPhotos = [record.photo];
+            } else {
+                diaperPhotos = [];
+            }
+            updateDiaperPhotoPreview();
+
+            document.getElementById('diaperModal').style.display = 'block';
+        }
+
+        function openDiaperModalForAllStudents() {
+            currentDiaperStudentId = '';
+            isAllDiaperMode = true;
+            selectedStoolValue = '';
+            document.getElementById('diaperModalTitle').textContent = '全班換尿布記錄';
+            document.getElementById('diaperModalStudent').textContent = '全班換尿布 (8 位學生)';
+            document.getElementById('selectedStool').textContent = '請選擇便便狀況';
+
+            // 設定預設時間為現在時間
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('diaperTimeInput').value = `${hours}:${minutes}`;
+
+            // 清除照片
+            diaperPhotos = [];
+            updateDiaperPhotoPreview();
+
+            document.getElementById('diaperModal').style.display = 'block';
+        }
+
+        function selectStool(stool) {
+            selectedStoolValue = stool;
+            document.getElementById('selectedStool').textContent = `已選擇：${stool}`;
+        }
+
+        function handleDiaperPhotoUpload(event) {
+            const files = event.target.files;
+            if (files && files.length > 0) {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        diaperPhotos.push(e.target.result);
+                        updateDiaperPhotoPreview();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+
+        function updateDiaperPhotoPreview() {
+            const preview = document.getElementById('diaperPhotoPreview');
+            preview.innerHTML = '';
+
+            diaperPhotos.forEach((photo, index) => {
+                const photoItem = document.createElement('div');
+                photoItem.style.position = 'relative';
+                photoItem.style.aspectRatio = '1';
+                photoItem.style.overflow = 'hidden';
+                photoItem.style.borderRadius = '10px';
+                photoItem.style.border = '2px solid #e0e0e0';
+                photoItem.innerHTML = `
+                    <img src="${photo}" alt="照片" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="window.open('${photo}', '_blank');" />
+                    <button type="button" onclick="removeDiaperPhotoByIndex(${index})" style="position: absolute; top: 5px; right: 5px; background: rgba(255, 0, 0, 0.7); color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-weight: bold; font-size: 16px; line-height: 1;">×</button>
+                `;
+                preview.appendChild(photoItem);
+            });
+        }
+
+        function removeDiaperPhotoByIndex(index) {
+            diaperPhotos.splice(index, 1);
+            updateDiaperPhotoPreview();
+        }
+
+        function removeDiaperPhoto() {
+            document.getElementById('diaperPhotoInput').value = '';
+            diaperPhotos = [];
+            updateDiaperPhotoPreview();
+        }
+
+        function closeDiaperModal() {
+            document.getElementById('diaperModal').style.display = 'none';
+            selectedStoolValue = '';
+            editingDiaperIndex = -1;
+            removeDiaperPhoto(); // 清除照片預覽
+        }
+
+        function diaperRecordComplete() {
+            if (!selectedStoolValue) {
+                alert('請選擇便便狀況');
+                return;
+            }
+
+            // 從輸入欄位取得時間，如果沒有則使用當前時間
+            const timeInput = document.getElementById('diaperTimeInput').value;
+            let time;
+            if (timeInput) {
+                // 將 HH:MM 格式轉換為 HH:MM 顯示格式
+                const [hours, minutes] = timeInput.split(':');
+                time = `${hours}:${minutes}`;
+            } else {
+                time = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+            }
+
+            if (isAllDiaperMode) {
+                // 全班模式：僅示意介面
+                closeDiaperModal();
+                alert(`全班換尿布記錄（示意）：時間 ${time}，便便狀況：${selectedStoolValue}`);
+            } else {
+                // 個人模式：為單一學生記錄
+                if (currentDiaperStudentId) {
+                    // 獲取照片陣列
+                    const photos = diaperPhotos.length > 0 ? [...diaperPhotos] : [];
+
+                    if (editingDiaperIndex >= 0) {
+                        // 編輯模式：更新現有記錄
+                        students[currentDiaperStudentId].diaper[editingDiaperIndex] = {
+                            time: time,
+                            description: '',
+                            stool: selectedStoolValue,
+                            photos: photos.length > 0 ? photos : null,
+                            // 兼容舊格式：保留第一張照片作為 photo
+                            photo: photos.length > 0 ? photos[0] : null
+                        };
+                    } else {
+                        // 新增模式：添加新記錄
+                        students[currentDiaperStudentId].diaper.push({
+                            time: time,
+                            description: '',
+                            stool: selectedStoolValue,
+                            photos: photos.length > 0 ? photos : null,
+                            // 兼容舊格式：保留第一張照片作為 photo
+                            photo: photos.length > 0 ? photos[0] : null
+                        });
+                    }
+                    closeDiaperModal();
+                    openModal(currentDiaperStudentId); // 重新載入modal顯示更新後的記錄
+                }
+            }
+        }
+
+        // 點擊modal外部關閉
+        window.onclick = function (event) {
+            const modal = document.getElementById('studentModal');
+            const calculatorModal = document.getElementById('calculatorModal');
+            const diaperModal = document.getElementById('diaperModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+            if (event.target === calculatorModal) {
+                closeCalculator();
+            }
+            if (event.target === diaperModal) {
+                closeDiaperModal();
+            }
+        }
+
+        // ESC鍵關閉modal和計算器
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                const calculatorModal = document.getElementById('calculatorModal');
+                const studentModal = document.getElementById('studentModal');
+                const diaperModal = document.getElementById('diaperModal');
+                if (diaperModal.style.display === 'block') {
+                    closeDiaperModal();
+                } else if (calculatorModal.style.display === 'block') {
+                    closeCalculator();
+                } else if (studentModal.style.display === 'block') {
+                    closeModal();
+                }
+            }
+        });
+
+        // 全班餵奶功能（僅示意介面）
+        function recordAllFeeding() {
+            // 打開計算器讓用戶輸入毫升數（僅示意）
+            openCalculatorForAllStudents();
+        }
+
+        // 全班換尿布功能（僅示意介面）
+        function recordAllDiaper() {
+            // 打開換尿布記錄介面（僅示意）
+            openDiaperModalForAllStudents();
+        }
+    </script>
+</body>
+
+</html>
