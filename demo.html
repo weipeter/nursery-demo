@@ -21,7 +21,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #E96546 0%, #FBB158 100%);
+            background: #E96546;
             color: white;
             padding: 30px;
             text-align: center;
@@ -41,10 +41,102 @@
             margin: 0;
         }
 
+        .header-class-btn {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            font-size: 1.8rem;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .header-class-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* 班級選擇Modal */
+        .class-select-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .class-select-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        .class-select-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .class-select-header h2 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .class-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .class-item {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .class-item:hover {
+            background: #E96546;
+            color: white;
+            border-color: #E96546;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 101, 70, 0.3);
+        }
+
+        .class-item.current {
+            background: #E96546;
+            color: white;
+            border-color: #E96546;
+        }
+
         .header-actions {
             display: flex;
             gap: 15px;
             align-items: center;
+        }
+
+        .medication-summary {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-right: 10px;
         }
 
         .header-btn {
@@ -94,6 +186,33 @@
             flex-direction: column;
             justify-content: space-between;
             min-height: 0;
+        }
+
+        .medicine-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .medicine-icon {
+            width: 28px;
+            height: 28px;
+            margin-bottom: 4px;
+        }
+
+        .medicine-count {
+            background: #E96546;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 30px;
+            text-align: center;
         }
 
         .student-card:hover {
@@ -248,7 +367,8 @@
             display: flex;
             gap: 20px;
             margin-bottom: 20px;
-            flex-shrink: 0;
+            flex: 1;
+            min-height: 0;
         }
 
         .modal-student-info {
@@ -263,6 +383,9 @@
 
         .modal-medication-section {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
         }
 
         .modal-action-buttons {
@@ -353,6 +476,7 @@
             display: flex;
             flex-direction: column;
             min-height: 0;
+            max-height: 100%;
         }
 
         .timeline-section h3 {
@@ -465,14 +589,28 @@
         }
 
         .calc-btn.clear {
-            background: linear-gradient(135deg, #FFB6C1 0%, #FFC0CB 100%);
+            background: #B8B8B8;
+            color: #333;
         }
 
         .calc-btn.complete {
-            background: linear-gradient(135deg, #E96546 0%, #FBB158 100%);
+            background: #E96546;
             grid-column: span 3;
             font-size: 1.1rem;
             width: 100%;
+            color: white;
+        }
+
+        .stool-btn {
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .stool-btn.selected {
+            background: #E96546 !important;
+            color: white !important;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(233, 101, 70, 0.4);
         }
 
         .timeline-icon {
@@ -557,6 +695,34 @@
             color: #666;
         }
 
+        .medication-item {
+            padding: 15px;
+        }
+
+        .medication-time {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .medication-content {
+            color: #666;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .medication-completed {
+            color: #7AD0B2;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .medication-completed.pending {
+            color: #B8B8B8;
+            font-weight: normal;
+        }
+
         /* 響應式設計 */
         @media (max-width: 768px) {
             .students-grid {
@@ -609,8 +775,9 @@
 <body>
     <div class="container">
         <div class="header">
-            <p>Elephant 大象班</p>
+            <button class="header-class-btn" onclick="openClassSelectModal()">Elephant 大象班</button>
             <div class="header-actions">
+                <span class="medication-summary" id="medicationSummary">今日餵藥：2/3</span>
                 <button class="header-btn header-btn-feeding" onclick="recordAllFeeding()">全班餵奶</button>
                 <button class="header-btn header-btn-diaper" onclick="recordAllDiaper()">全班換尿布</button>
             </div>
@@ -619,6 +786,10 @@
         <div class="students-grid">
             <!-- 第一行學生 -->
             <div class="student-card present" onclick="openModal('student1')">
+                <div class="medicine-badge">
+                    <img src="./medicine.png" alt="餵藥" class="medicine-icon">
+                    <div class="medicine-count">2/3</div>
+                </div>
                 <img src="./1.jpg" alt="小美" class="student-avatar">
                 <div class="student-name">小美</div>
                 <div class="action-buttons">
@@ -731,6 +902,22 @@
         </div>
     </div>
 
+    <!-- 班級選擇Modal -->
+    <div id="classSelectModal" class="class-select-modal">
+        <div class="class-select-content">
+            <div class="class-select-header">
+                <h2>選擇班級</h2>
+            </div>
+            <div class="class-list">
+                <div class="class-item current" onclick="selectClass('Elephant 大象班')">Elephant 大象班</div>
+                <div class="class-item" onclick="selectClass('Panda 熊貓班')">Panda 熊貓班</div>
+                <div class="class-item" onclick="selectClass('Rabbit 兔子班')">Rabbit 兔子班</div>
+                <div class="class-item" onclick="selectClass('Lion 獅子班')">Lion 獅子班</div>
+                <div class="class-item" onclick="selectClass('Tiger 老虎班')">Tiger 老虎班</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal -->
     <div id="studentModal" class="modal">
         <div class="modal-content">
@@ -754,9 +941,9 @@
                 <div class="modal-medication-section">
                     <div class="timeline-section medication">
                         <h3><span class="title-text">
-                                <div class="timeline-icon"></div>託藥單
+                                <div class="timeline-icon"></div>託藥單 <span id="medicationCount">(0/0)</span>
                             </span></h3>
-                        <div id="medicationRecords">
+                        <div class="timeline-content" id="medicationRecords">
                             <!-- 託藥記錄將在這裡動態生成 -->
                         </div>
                     </div>
@@ -834,18 +1021,14 @@
                         <label
                             style="display: block; margin-bottom: 10px; color: #333; font-weight: bold;">便便狀況：</label>
                         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                            <button class="calc-btn" onclick="selectStool('正常')"
-                                style="background: linear-gradient(135deg, #98FB98 0%, #90EE90 100%);">正常</button>
-                            <button class="calc-btn" onclick="selectStool('偏軟')"
-                                style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);">偏軟</button>
-                            <button class="calc-btn" onclick="selectStool('偏硬')"
-                                style="background: linear-gradient(135deg, #CD853F 0%, #8B4513 100%);">偏硬</button>
-                            <button class="calc-btn" onclick="selectStool('無')"
-                                style="background: linear-gradient(135deg, #E0E0E0 0%, #B8B8B8 100%);">無</button>
-                        </div>
-                        <div id="selectedStool"
-                            style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 10px; text-align: center; color: #333; font-weight: bold; min-height: 20px;">
-                            請選擇便便狀況
+                            <button id="stoolBtn-正常" class="calc-btn stool-btn" onclick="selectStool('正常')"
+                                style="background: #e3e2e2; color: #B8B8B8;">正常</button>
+                            <button id="stoolBtn-偏軟" class="calc-btn stool-btn" onclick="selectStool('偏軟')"
+                                style="background: #e3e2e2; color: #B8B8B8;">偏軟</button>
+                            <button id="stoolBtn-偏硬" class="calc-btn stool-btn" onclick="selectStool('偏硬')"
+                                style="background: #e3e2e2; color: #B8B8B8;">偏硬</button>
+                            <button id="stoolBtn-無" class="calc-btn stool-btn" onclick="selectStool('無')"
+                                style="background: #e3e2e2; color: #B8B8B8;">無</button>
                         </div>
                     </div>
                 </div>
@@ -855,7 +1038,7 @@
                     <input type="file" id="diaperPhotoInput" accept="image/*" multiple style="display: none;"
                         onchange="handleDiaperPhotoUpload(event)" />
                     <button type="button" class="calc-btn" onclick="document.getElementById('diaperPhotoInput').click()"
-                        style="width: 100%; background: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 100%); margin-bottom: 15px;">
+                        style="width: 100%; background: #98CCF0; margin-bottom: 15px; color: white;">
                         📷 上傳照片
                     </button>
                     <div id="diaperPhotoPreview"
@@ -892,9 +1075,21 @@
                     { time: '17:30', description: '簽退 - 爸爸接走' }
                 ],
                 medication: [
-                    { time: '10:30', description: '早上點心後' },
-                    { time: '12:30', description: '午餐後' },
-                    { time: '15:00', description: '下午點心前' }
+                    {
+                        medicationTime: '早上點心後',
+                        medicationContent: '藥水 5cc',
+                        completedTime: '10:30'
+                    },
+                    {
+                        medicationTime: '午餐後',
+                        medicationContent: '藥丸 2顆',
+                        completedTime: ''
+                    },
+                    {
+                        medicationTime: '下午點心前',
+                        medicationContent: '藥水 3cc',
+                        completedTime: '15:00'
+                    }
                 ]
             },
             'student2': {
@@ -1131,20 +1326,63 @@
             // 更新託藥記錄
             const medicationRecords = document.getElementById('medicationRecords');
             medicationRecords.innerHTML = '';
+
+            // 計算已完成和總數
+            let completedCount = 0;
+            let totalCount = 0;
+
             if (student.medication && student.medication.length === 0) {
                 medicationRecords.innerHTML = '<div class="timeline-item"><div class="description">今日無託藥</div></div>';
             } else if (student.medication) {
+                totalCount = student.medication.length;
                 student.medication.forEach(record => {
                     const item = document.createElement('div');
-                    item.className = 'timeline-item';
+
+                    // 處理舊格式（兼容）
+                    let medicationTime = record.medicationTime || record.description || '';
+                    let medicationContent = record.medicationContent || '';
+                    let completedTime = record.completedTime || record.time || '';
+
+                    // 如果沒有新格式，使用舊格式
+                    if (!record.medicationTime && record.description) {
+                        medicationTime = record.description;
+                        medicationContent = '';
+                        completedTime = record.time || '';
+                    }
+
+                    // 計算已完成數量
+                    const isCompleted = completedTime && completedTime.trim() !== '';
+                    if (isCompleted) {
+                        completedCount++;
+                    }
+
+                    // 根據完成狀態設置樣式
+                    item.className = 'timeline-item medication-item';
+                    if (isCompleted) {
+                        item.style.borderLeftColor = '#7AD0B2'; // 綠色
+                    } else {
+                        item.style.borderLeftColor = '#B8B8B8'; // 灰色
+                    }
+
+                    const completedTimeHtml = completedTime
+                        ? `<div class="medication-completed">完成時間：${completedTime}</div>`
+                        : `<div class="medication-completed pending">尚未處理</div>`;
+
                     item.innerHTML = `
-                        <div class="time">${record.time}</div>
-                        <div class="description">${record.description}</div>
+                        <div class="medication-time">服藥時間：${medicationTime}</div>
+                        ${medicationContent ? `<div class="medication-content">服藥內容：${medicationContent}</div>` : ''}
+                        ${completedTimeHtml}
                     `;
                     medicationRecords.appendChild(item);
                 });
             } else {
                 medicationRecords.innerHTML = '<div class="timeline-item"><div class="description">今日無託藥</div></div>';
+            }
+
+            // 更新標題顯示已完成次數
+            const medicationCountElement = document.getElementById('medicationCount');
+            if (medicationCountElement) {
+                medicationCountElement.textContent = `(${completedCount}/${totalCount})`;
             }
 
             document.getElementById('studentModal').style.display = 'block';
@@ -1227,8 +1465,14 @@
                 // 關閉計算器
                 document.getElementById('calculatorModal').style.display = 'none';
 
-                // 顯示成功訊息
-                alert(`已記錄 ${students[currentStudentId].name} 的餵奶：${amount}，時間：${time}`);
+                // 重新載入modal顯示更新後的記錄（如果modal是打開的）
+                const studentModal = document.getElementById('studentModal');
+                if (studentModal.style.display === 'block') {
+                    openModal(currentStudentId);
+                } else {
+                    // 如果modal沒有打開，只顯示成功訊息
+                    alert(`已記錄 ${students[currentStudentId].name} 的餵奶：${amount}，時間：${time}`);
+                }
             }
         }
 
@@ -1265,21 +1509,13 @@
         }
 
         function addFeedingRecord() {
-            const time = prompt('請輸入餵奶時間 (格式: HH:MM):');
-            const amount = prompt('請輸入牛奶容量 (格式: XXXml):');
+            // 找到當前modal中顯示的學生ID
+            const modalName = document.getElementById('modalName').textContent;
+            const studentId = Object.keys(students).find(id => students[id].name === modalName);
 
-            if (time && amount) {
-                // 找到當前modal中顯示的學生ID
-                const modalName = document.getElementById('modalName').textContent;
-                const studentId = Object.keys(students).find(id => students[id].name === modalName);
-
-                if (studentId) {
-                    students[studentId].feeding.push({
-                        time: time,
-                        description: amount
-                    });
-                    openModal(studentId); // 重新載入modal顯示更新後的記錄
-                }
+            if (studentId) {
+                // 打開計算機介面讓用戶輸入毫升數
+                openCalculator(studentId);
             }
         }
 
@@ -1301,7 +1537,12 @@
                 selectedStoolValue = '';
                 document.getElementById('diaperModalTitle').textContent = '換尿布記錄';
                 document.getElementById('diaperModalStudent').textContent = students[studentId].name;
-                document.getElementById('selectedStool').textContent = '請選擇便便狀況';
+
+                // 清除所有按鈕的選中狀態
+                const allStoolBtns = document.querySelectorAll('.stool-btn');
+                allStoolBtns.forEach(btn => {
+                    btn.classList.remove('selected');
+                });
 
                 // 設定預設時間為現在時間
                 const now = new Date();
@@ -1328,7 +1569,18 @@
 
             document.getElementById('diaperModalTitle').textContent = '編輯換尿布記錄';
             document.getElementById('diaperModalStudent').textContent = students[studentId].name;
-            document.getElementById('selectedStool').textContent = `已選擇：${selectedStoolValue}`;
+
+            // 移除所有按鈕的選中狀態
+            const allStoolBtns = document.querySelectorAll('.stool-btn');
+            allStoolBtns.forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            // 設置對應按鈕為選中狀態
+            const selectedBtn = document.getElementById(`stoolBtn-${selectedStoolValue}`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('selected');
+            }
 
             // 設定時間為記錄中的時間
             const [hours, minutes] = record.time.split(':');
@@ -1354,7 +1606,12 @@
             selectedStoolValue = '';
             document.getElementById('diaperModalTitle').textContent = '全班換尿布記錄';
             document.getElementById('diaperModalStudent').textContent = '全班換尿布 (8 位學生)';
-            document.getElementById('selectedStool').textContent = '請選擇便便狀況';
+
+            // 清除所有按鈕的選中狀態
+            const allStoolBtns = document.querySelectorAll('.stool-btn');
+            allStoolBtns.forEach(btn => {
+                btn.classList.remove('selected');
+            });
 
             // 設定預設時間為現在時間
             const now = new Date();
@@ -1371,7 +1628,18 @@
 
         function selectStool(stool) {
             selectedStoolValue = stool;
-            document.getElementById('selectedStool').textContent = `已選擇：${stool}`;
+
+            // 移除所有按鈕的選中狀態
+            const allStoolBtns = document.querySelectorAll('.stool-btn');
+            allStoolBtns.forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            // 添加選中狀態到被點擊的按鈕
+            const selectedBtn = document.getElementById(`stoolBtn-${stool}`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('selected');
+            }
         }
 
         function handleDiaperPhotoUpload(event) {
@@ -1485,6 +1753,7 @@
             const modal = document.getElementById('studentModal');
             const calculatorModal = document.getElementById('calculatorModal');
             const diaperModal = document.getElementById('diaperModal');
+            const classSelectModal = document.getElementById('classSelectModal');
             if (event.target === modal) {
                 closeModal();
             }
@@ -1494,6 +1763,9 @@
             if (event.target === diaperModal) {
                 closeDiaperModal();
             }
+            if (event.target === classSelectModal) {
+                closeClassSelectModal();
+            }
         }
 
         // ESC鍵關閉modal和計算器
@@ -1502,7 +1774,10 @@
                 const calculatorModal = document.getElementById('calculatorModal');
                 const studentModal = document.getElementById('studentModal');
                 const diaperModal = document.getElementById('diaperModal');
-                if (diaperModal.style.display === 'block') {
+                const classSelectModal = document.getElementById('classSelectModal');
+                if (classSelectModal.style.display === 'block') {
+                    closeClassSelectModal();
+                } else if (diaperModal.style.display === 'block') {
                     closeDiaperModal();
                 } else if (calculatorModal.style.display === 'block') {
                     closeCalculator();
@@ -1523,6 +1798,48 @@
             // 打開換尿布記錄介面（僅示意）
             openDiaperModalForAllStudents();
         }
+
+        // 更新今日餵藥統計（示意）
+        function updateMedicationSummary() {
+            const summaryElement = document.getElementById('medicationSummary');
+            if (summaryElement) {
+                summaryElement.textContent = `今日餵藥：2/3`;
+            }
+        }
+
+        // 頁面載入時更新統計
+        updateMedicationSummary();
+
+        // 班級選擇功能
+        function openClassSelectModal() {
+            document.getElementById('classSelectModal').style.display = 'block';
+        }
+
+        function closeClassSelectModal() {
+            document.getElementById('classSelectModal').style.display = 'none';
+        }
+
+        function selectClass(className) {
+            // 更新按鈕文字
+            const classBtn = document.querySelector('.header-class-btn');
+            if (classBtn) {
+                classBtn.textContent = className;
+            }
+
+            // 更新當前選中的班級樣式
+            const classItems = document.querySelectorAll('.class-item');
+            classItems.forEach(item => {
+                if (item.textContent === className) {
+                    item.classList.add('current');
+                } else {
+                    item.classList.remove('current');
+                }
+            });
+
+            // 關閉 modal
+            closeClassSelectModal();
+        }
+
     </script>
 </body>
 
