@@ -983,6 +983,12 @@
                 <h3 id="calculatorTitle">餵奶記錄</h3>
                 <p id="calculatorStudent">學生姓名</p>
             </div>
+            <div style="margin-bottom: 20px;">
+                <label
+                    style="display: block; margin-bottom: 10px; color: #333; font-weight: bold; text-align: center;">時間：</label>
+                <input type="time" id="feedingTimeInput"
+                    style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; text-align: center;" />
+            </div>
             <div class="calculator-display" id="calculatorDisplay">0</div>
             <div class="calculator-keypad">
                 <button class="calc-btn" onclick="calculatorInput('1')">1</button>
@@ -1276,11 +1282,20 @@
             if (student.feeding.length === 0) {
                 feedingRecords.innerHTML = '<div class="timeline-item"><div class="description">今日尚無餵奶記錄</div></div>';
             } else {
-                student.feeding.forEach((record, index) => {
+                // 按照時間排序（最早的在最上面）
+                const sortedFeeding = [...student.feeding].sort((a, b) => {
+                    const timeA = a.time || '00:00';
+                    const timeB = b.time || '00:00';
+                    return timeA.localeCompare(timeB); // 升序排序
+                });
+
+                sortedFeeding.forEach((record, sortedIndex) => {
+                    // 找到原始索引以正確刪除
+                    const originalIndex = student.feeding.indexOf(record);
                     const item = document.createElement('div');
                     item.className = 'timeline-item';
                     item.innerHTML = `
-                        <div class="time">${record.time}<span>${record.description}</span><span class="delete-btn" onclick="deleteFeedingRecord('${studentId}', ${index})">&times;</span></div>
+                        <div class="time">${record.time}<span>${record.description}</span><span class="delete-btn" onclick="deleteFeedingRecord('${studentId}', ${originalIndex})">&times;</span></div>
                     `;
                     feedingRecords.appendChild(item);
                 });
@@ -1292,7 +1307,16 @@
             if (student.diaper.length === 0) {
                 diaperRecords.innerHTML = '<div class="timeline-item"><div class="description">今日尚無換尿布記錄</div></div>';
             } else {
-                student.diaper.forEach((record, index) => {
+                // 按照時間排序（最早的在最上面）
+                const sortedDiaper = [...student.diaper].sort((a, b) => {
+                    const timeA = a.time || '00:00';
+                    const timeB = b.time || '00:00';
+                    return timeA.localeCompare(timeB); // 升序排序
+                });
+
+                sortedDiaper.forEach((record, sortedIndex) => {
+                    // 找到原始索引以正確編輯和刪除
+                    const originalIndex = student.diaper.indexOf(record);
                     const item = document.createElement('div');
                     item.className = 'timeline-item clickable';
                     const stoolStatus = record.stool || '無';
@@ -1301,7 +1325,7 @@
                         if (event.target.classList.contains('delete-btn') || event.target.tagName === 'IMG') {
                             return;
                         }
-                        editDiaperRecord(studentId, index);
+                        editDiaperRecord(studentId, originalIndex);
                     };
                     let photoHtml = '';
                     // 支援多張照片或單張照片
@@ -1314,7 +1338,7 @@
                         photoHtml += `</div>`;
                     }
                     item.innerHTML = `
-                        <div class="time">${record.time}<span class="delete-btn" onclick="event.stopPropagation(); deleteDiaperRecord('${studentId}', ${index})">&times;</span></div>
+                        <div class="time">${record.time}<span class="delete-btn" onclick="event.stopPropagation(); deleteDiaperRecord('${studentId}', ${originalIndex})">&times;</span></div>
                         <div class="description">便便狀況：${stoolStatus}</div>
                         ${photoHtml}
                     `;
@@ -1335,7 +1359,28 @@
                 medicationRecords.innerHTML = '<div class="timeline-item"><div class="description">今日無託藥</div></div>';
             } else if (student.medication) {
                 totalCount = student.medication.length;
-                student.medication.forEach(record => {
+
+                // 按照時間排序（最新的在最上面）
+                // 優先使用 completedTime，如果沒有則使用 medicationTime
+                const sortedMedication = [...student.medication].sort((a, b) => {
+                    // 處理舊格式（兼容）
+                    let timeA = a.completedTime || a.time || a.medicationTime || a.description || '00:00';
+                    let timeB = b.completedTime || b.time || b.medicationTime || b.description || '00:00';
+
+                    // 如果時間格式不是 HH:MM，嘗試提取時間部分
+                    if (timeA.length > 5) {
+                        const matchA = timeA.match(/(\d{1,2}):(\d{2})/);
+                        if (matchA) timeA = `${matchA[1].padStart(2, '0')}:${matchA[2]}`;
+                    }
+                    if (timeB.length > 5) {
+                        const matchB = timeB.match(/(\d{1,2}):(\d{2})/);
+                        if (matchB) timeB = `${matchB[1].padStart(2, '0')}:${matchB[2]}`;
+                    }
+
+                    return timeB.localeCompare(timeA); // 降序排序
+                });
+
+                sortedMedication.forEach(record => {
                     const item = document.createElement('div');
 
                     // 處理舊格式（兼容）
@@ -1407,6 +1452,13 @@
             document.getElementById('calculatorStudent').textContent = students[studentId].name;
             document.getElementById('calculatorTitle').textContent = '餵奶記錄';
             document.getElementById('calculatorDisplay').textContent = calculatorValue + 'ml';
+
+            // 設定預設時間為當前時間
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('feedingTimeInput').value = `${hours}:${minutes}`;
+
             document.getElementById('calculatorModal').style.display = 'block';
         }
 
@@ -1418,6 +1470,13 @@
             document.getElementById('calculatorStudent').textContent = '全班餵奶 (8 位學生)';
             document.getElementById('calculatorTitle').textContent = '全班餵奶記錄';
             document.getElementById('calculatorDisplay').textContent = calculatorValue + 'ml';
+
+            // 設定預設時間為當前時間
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('feedingTimeInput').value = `${hours}:${minutes}`;
+
             document.getElementById('calculatorModal').style.display = 'block';
         }
 
@@ -1446,7 +1505,16 @@
 
         function calculatorComplete() {
             const amount = calculatorValue + 'ml';
-            const time = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+            // 從時間輸入欄位取得時間，格式轉換為 HH:MM
+            const timeInput = document.getElementById('feedingTimeInput').value;
+            let time = '';
+            if (timeInput) {
+                const [hours, minutes] = timeInput.split(':');
+                time = `${hours}:${minutes}`;
+            } else {
+                // 如果沒有輸入時間，使用當前時間
+                time = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+            }
 
             if (isAllStudentsMode) {
                 // 全班模式：僅示意介面
